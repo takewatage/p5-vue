@@ -69,6 +69,7 @@ export default {
         }
       }
 
+      //ノード表示
       function nodeShow(item) {
         const node = update(item)
 
@@ -96,8 +97,17 @@ export default {
       }
 
       function showSpring(n1, n2) {
-        p5.stroke(255, 255, 255, 255);
-        p5.line(n1.x, n1.y, n2.x, n2.y);
+        //２点の絶対値
+        const dx = n2.x - n1.x;
+        const dy = n2.y - n1.y;
+        //2つの距離(ピタゴラス)
+        const distance = Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2));
+        // ノード間が100ピクセル以内ならバネを表示します。
+        if (distance < 100) {
+          p5.stroke(255, 255, 255, 255);
+          p5.line(n1.x, n1.y, n2.x, n2.y);
+        }
+        
       }
     }
 
