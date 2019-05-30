@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   /*
   ** Headers of the page
   */
@@ -34,6 +34,19 @@ module.exports = {
         })
       }
     }
-  }
+  },
+  css: [{ src: '~/assets/sass/main.scss', lang: 'scss' }],
+
+  //プラグイン
+  plugins: [
+    { src: '~plugins/bootstrap-vue.js' },
+  ],
+
+  modules: ['@nuxtjs/style-resources'],
+  styleResources: {
+    scss: [
+      './assets/sass/*.scss',
+    ]
+  },
 }
 
