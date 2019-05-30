@@ -1,6 +1,8 @@
 <template>
   <section class="container">
     <div class="d-flex justify-content-center" id="p5Canvas"></div>
+
+    <!-- <input type="number" v-model="nodeNum" /> -->
   </section>
 </template>
 
@@ -9,15 +11,16 @@
 export default {
   data () {
     return {
-      size: {
-        x: 640,
-        y: 640,
-      },
       node: {
         x: 0,
         y: 0,
+        // x座標の速度
+        vx: 0,
+        // y座標の速度
+        vy: 0,
         radius: 0
-      }
+      },
+      nodeNum: 50
     }
   },
   
@@ -26,16 +29,24 @@ export default {
     const script =  (p5) => {
       let speed = 2;
       let posX = 0;
-      let nodes = []      
+      let nodes = []  
+      //canvasのおおきさ
+      const width = 640
+      const height = 640
+
+      let node1 = this.node
+      let node2 = this.node
+
+      const nodeNum = this.nodeNum
       
       p5.setup = _ => {
-        let canvas = p5.createCanvas(this.size.x, this.size.y)
+        let canvas = p5.createCanvas(width, height)
         canvas.parent("p5Canvas");
 
         p5.smooth(4);
         // 50個ノードを作成
-        for (let i = 0; i < 50; i++) {          
-          nodes[i] = this.makeNode(this.size.x, this.size.y)
+        for (let i = 0; i < this.nodeNum; i++) {          
+          nodes[i] = this.makeNode(width, height)
         }        
       }
 
@@ -43,16 +54,50 @@ export default {
         p5.fill(0, 0, 50, 80);
         p5.rect(0, 0, 640, 640);
               
-        for (let i = 0; i < 50; i++) {
+        //ノード表示
+        for (let i = 0; i < this.nodeNum; i++) {
           this.node = nodes[i];
           nodeShow(this.node)
-        }  
+        }
+        //アーク表示
+        for (let i = 0; i < this.nodeNum -1; i++) {
+          node1 = nodes[i];
+          for (let j = 0; j < this.nodeNum; j++) {
+            node2 = nodes[j];
+            showSpring(node1, node2);
+          }
+        }
       }
 
-      function nodeShow(node) {
+      function nodeShow(item) {
+        const node = update(item)
+
         p5.fill(255, 255,255, 255)
         // xy座標に、半径radiusの円を表示
         p5.ellipse(node.x, node.y, node.radius, node.radius);
+      }
+
+      function update(node) {
+        node.x += node.vx;
+        node.y += node.vy;
+        
+        if (node.x > width) {
+          node.x = 0;
+        } else if (node.x < 0) {
+          node.x = width;
+        }
+        if (node.y > height) {
+          node.y = 0;
+        } else if (node.y < 0) {
+          node.y = height;
+        }
+        
+        return node
+      }
+
+      function showSpring(n1, n2) {
+        p5.stroke(255, 255, 255, 255);
+        p5.line(n1.x, n1.y, n2.x, n2.y);
       }
     }
 
@@ -65,7 +110,10 @@ export default {
       const node = new Object()
       node.x = Math.random() * (max_x - 1) + 1;
       node.y = Math.random() * (max_y - 1) + 1;
-      node.radius = 8;      
+      node.vx = (Math.random()*1)-0.5
+      node.vy = (Math.random()*1)-0.5
+      node.radius = 8;   
+
       return node
     }
   },
