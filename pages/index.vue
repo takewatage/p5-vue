@@ -1,6 +1,6 @@
 <template>
-  <section class="container">
-    <div class="d-flex justify-content-center" id="p5Canvas"></div>
+  <section>
+    <div id="p5Canvas"></div>
 
     <!-- <input type="number" v-model="nodeNum" /> -->
   </section>
@@ -20,42 +20,48 @@ export default {
         vy: 0,
         radius: 0
       },
-      nodeNum: 50
+      nodeNum: 50,
+      test: {
+        x: 0,
+        y: 0
+      }
     }
   },
-  
-  mounted() {    
-    
+
+  mounted() {
+
+
     const script =  (p5) => {
       let speed = 2;
       let posX = 0;
-      let nodes = []  
+      let nodes = []
       //canvasのおおきさ
-      const width = 640
-      const height = 640
+      const width = window.innerWidth
+      const height = window.innerHeight
 
       let node1 = this.node
       let node2 = this.node
 
       const nodeNum = this.nodeNum
-      
+
       p5.setup = _ => {
         let canvas = p5.createCanvas(width, height)
         canvas.parent("p5Canvas");
 
         p5.smooth(4);
         // 50個ノードを作成
-        for (let i = 0; i < this.nodeNum; i++) {          
+        for (let i = 0; i < this.nodeNum; i++) {
           nodes[i] = this.makeNode(width, height)
-        }        
+        }
       }
 
+      //描画
       p5.draw = _ => {
-        p5.fill(0, 0, 50, 80);
-        p5.rect(0, 0, 640, 640);
-              
+        p5.fill(0, 0, 0, 80);
+        p5.rect(0, 0, width, height);
+
         //ノード表示
-        for (let i = 0; i < this.nodeNum; i++) {
+        for (let i = 0; i < nodes.length; i++) {
           this.node = nodes[i];
           nodeShow(this.node)
         }
@@ -67,6 +73,10 @@ export default {
             showSpring(node1, node2);
           }
         }
+      }
+
+      //マウスクリック処理
+      p5.mouseClicked = _=> {
       }
 
       //ノード表示
@@ -81,7 +91,7 @@ export default {
       function update(node) {
         node.x += node.vx;
         node.y += node.vy;
-        
+
         if (node.x > width) {
           node.x = 0;
         } else if (node.x < 0) {
@@ -92,7 +102,7 @@ export default {
         } else if (node.y < 0) {
           node.y = height;
         }
-        
+
         return node
       }
 
@@ -101,13 +111,24 @@ export default {
         const dx = n2.x - n1.x;
         const dy = n2.y - n1.y;
         //2つの距離(ピタゴラス)
-        const distance = Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2));
+        const distance = Math.sqrt(Math.pow(dx,2) + Math.pow(dy,2))
         // ノード間が100ピクセル以内ならバネを表示します。
         if (distance < 100) {
-          p5.stroke(255, 255, 255, 255);
-          p5.line(n1.x, n1.y, n2.x, n2.y);
+          const alpha = p5.map(1 - distance / 100, 0, 1, 0, 255)
+
+          p5.stroke(255, 255, 255, alpha)
+          p5.line(n1.x, n1.y, n2.x, n2.y)
+
+          // ばね効果
+          // 上記で求めた、距離dx,dyに係数0.0001を掛けて、速度を追加します。
+          const ax = dx * 0.0001;
+          const ay = dy * 0.0001;
+          n1.vx += ax;
+          n1.vy += ay;
+          n2.vx += ax;
+          n2.vy += ay;
         }
-        
+
       }
     }
 
@@ -116,13 +137,13 @@ export default {
   },
 
   methods: {
-    makeNode(max_x, max_y) {      
+    makeNode(max_x, max_y) {
       const node = new Object()
       node.x = Math.random() * (max_x - 1) + 1;
       node.y = Math.random() * (max_y - 1) + 1;
       node.vx = (Math.random()*1)-0.5
       node.vy = (Math.random()*1)-0.5
-      node.radius = 8;   
+      node.radius = 8;
 
       return node
     }
