@@ -49,6 +49,13 @@ export default class Player extends Model {
     this.vy = -5;
   }
 
+  /**
+   * プレイヤーが生きてるかどうか
+   */
+  get playerIsAlive() {
+    return this.y < window.innerHeight;
+  }
+
   drawPlayer(p5) {
     p5.noStroke()
     p5.fill("#5f6caf");

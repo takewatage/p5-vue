@@ -17,7 +17,8 @@
               block: undefined,
               blocks: [],
               width: 0,
-              height: 0
+              height: 0,
+              gameState: '' // ゲームの状態。"play" か "gameover"
           }
       },
 
@@ -30,10 +31,6 @@
 
       methods: {
           p5(p5) {
-              // const width = window.innerWidth
-              // const height = window.innerHeight
-
-
               p5.setup = () => {
                   let canvas = p5.createCanvas(this.width, this.height)
                   canvas.parent("p5Canvas");
@@ -52,11 +49,16 @@
 
               //マウスクリック処理
               p5.mouseClicked = _=> {
-                  this.player.applyJump();
-              }
-
-              p5.keyTyped = _=> {
-                  console.log(`blocks: ${this.blocks.length}`);
+                  switch (this.gameState) {
+                      case "play":
+                          // プレイ中の状態ならプレイヤーをジャンプさせる
+                          this.player.applyJump()
+                          break;
+                      case "gameover":
+                          // ゲームオーバー状態ならリセット
+                          this.resetGame()
+                          break;
+                  }
               }
 
               return p5
@@ -65,20 +67,20 @@
 
           /** ゲームの初期化・リセット */
           resetGame() {
-              // プレイヤーを作成
               this.player = new Player()
 
-              // 初期ブロックを作成
-              this.blocks.push( new Block({
-                  width: this.width,
-                  x: this.width / 2
-              }))
+              this.blocks = []
+
+              this.gameState = "play";
+
           },
 
           /**
            * ゲーム更新
           */
           updateGame(p5) {
+              if (this.gameState === "gameover") return;
+
               // ブロックの追加と削除
               // 一定間隔で追加
               if (p5.frameCount % 80 === 1) {
@@ -95,6 +97,9 @@
 
               // プレイヤーに重力を適用
               this.player.applyGravity()
+
+              // プレイヤーが死んでいたらゲームオーバー
+              if (!this.player.playerIsAlive) this.gameState = "gameover";
           },
 
           /** ゲーム描画 */
@@ -103,6 +108,9 @@
               p5.background(0)
               this.player.drawPlayer(p5)
               for (let block of this.blocks) block.drawBlock(p5);
+
+              // ゲームオーバーならそれ用の画面を表示
+              if (this.gameState === "gameover") this.drawGameoverScreen(p5);
           },
 
           /**
@@ -114,6 +122,17 @@
               this.blocks.push(new Block({y: y}));　// 下のブロック
               this.blocks.push(new Block({y: y + height})); // 上のブロック
               // console.log(this.blocks)
+          },
+
+          /**
+           * ゲームオーバー画面描画
+           */
+          drawGameoverScreen(p5) {
+              p5.background(0, 192); // 透明度 192 の黒
+              p5.fill(255);
+              p5.textSize(64);
+              p5.textAlign(p5.CENTER, p5.CENTER); // 横に中央揃え ＆ 縦にも中央揃え
+              p5.text("GAME OVER", p5.width / 2, p5.height / 2); // 画面中央にテキスト表示
           },
 
           makeP5(script) {
