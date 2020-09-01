@@ -15,60 +15,39 @@
           return {
               player: undefined,
               block: undefined,
-              blocks: []
+              blocks: [],
+              width: 0,
+              height: 0
           }
       },
 
       mounted() {
+          this.width = window.innerWidth
+          this.height = window.innerHeight
           const script = (p5) => this.p5(p5)
           this.makeP5(script)
       },
 
       methods: {
           p5(p5) {
-              const width = window.innerWidth
-              const height = window.innerHeight
+              // const width = window.innerWidth
+              // const height = window.innerHeight
+
 
               p5.setup = () => {
-                  let canvas = p5.createCanvas(width, height)
+                  let canvas = p5.createCanvas(this.width, this.height)
                   canvas.parent("p5Canvas");
 
                   p5.rectMode(p5.CENTER);
 
-                  // プレイヤーを作成
-                  this.player = new Player()
-
-                  // 初期ブロックを作成
-                  this.blocks.push( new Block({
-                      width: width,
-                      x: width / 2
-                  }))
+                  this.resetGame(p5)
               }
 
 
               //描画
               p5.draw = _ => {
-                  // ブロックの追加と削除
-                  // 一定間隔で追加
-                  if (p5.frameCount % 80 === 1) {
-                      this.addBlockPair(p5);
-                  }
-                  // 範囲外になったら削除
-                  this.blocks = linq.from(this.blocks).where(x => {
-                      if(x.blockIsAlive) return x
-                  }).toArray()
-
-                  // エンティティの位置を更新
-                  this.player.updatePosition()
-                  for(let block of this.blocks)  block.updatePosition();
-
-                  // プレイヤーに重力を適用
-                  this.player.applyGravity()
-
-                  // エンティティを描画
-                  p5.background(0)
-                  this.player.drawPlayer(p5)
-                  for (let block of this.blocks) block.drawBlock(p5);
+                  this.updateGame(p5)
+                  this.drawGame(p5)
               }
 
               //マウスクリック処理
@@ -82,6 +61,48 @@
 
               return p5
 
+          },
+
+          /** ゲームの初期化・リセット */
+          resetGame() {
+              // プレイヤーを作成
+              this.player = new Player()
+
+              // 初期ブロックを作成
+              this.blocks.push( new Block({
+                  width: this.width,
+                  x: this.width / 2
+              }))
+          },
+
+          /**
+           * ゲーム更新
+          */
+          updateGame(p5) {
+              // ブロックの追加と削除
+              // 一定間隔で追加
+              if (p5.frameCount % 80 === 1) {
+                  this.addBlockPair(p5);
+              }
+              // 範囲外になったら削除
+              this.blocks = linq.from(this.blocks).where(x => {
+                  if(x.blockIsAlive) return x
+              }).toArray()
+
+              // エンティティの位置を更新
+              this.player.updatePosition()
+              for(let block of this.blocks)  block.updatePosition();
+
+              // プレイヤーに重力を適用
+              this.player.applyGravity()
+          },
+
+          /** ゲーム描画 */
+          drawGame(p5) {
+              // エンティティを描画
+              p5.background(0)
+              this.player.drawPlayer(p5)
+              for (let block of this.blocks) block.drawBlock(p5);
           },
 
           /**
