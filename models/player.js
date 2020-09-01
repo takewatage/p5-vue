@@ -52,6 +52,6 @@ export default class Player extends Model {
   drawPlayer(p5) {
     p5.noStroke()
     p5.fill("#5f6caf");
-    p5.square(this.x, this.y, 40);
+    p5.square(this.x, this.y, 50);
   }
 }

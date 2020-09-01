@@ -1,7 +1,7 @@
 import { Model } from '@team-decorate/alcjs'
 
 const FILLABEL = [
-  'x', 'y', 'vx', 'vy'
+  'x', 'y', 'vx', 'vy', 'width', 'height'
 ]
 
 export default class Block extends Model {
@@ -9,11 +9,12 @@ export default class Block extends Model {
     super()
     this.fillable = FILLABEL
 
-    this.x = 900
-    this.y = null
     this.vx = -2
     this.vy = 0
-
+    this.width = 40
+    this.height = (window.innerHeight / 4)
+    this.x = window.innerWidth + this.width
+    this.y = window.innerHeight - this.height / 2
 
     this.data = data
 
@@ -21,6 +22,14 @@ export default class Block extends Model {
 
   get _model () {
     return 'Block'
+  }
+
+  /**
+   * ブロックの位置が画面内なら true を返す
+   * @returns {boolean}
+   */
+  get blockIsAlive() {
+    return 0 - (this.width / 2) < this.x;
   }
 
 
@@ -32,22 +41,6 @@ export default class Block extends Model {
     this.y += this.vy;
   }
 
-  /**
-   * 重力加算
-   * @param entity
-   * @param num
-   */
-  applyGravity(num=0.15) {
-    this.vy +=num;
-  }
-
-  /**
-   * ジャンプ
-   * @param entity
-   */
-  applyJump(entity) {
-    this.vy = -5;
-  }
 
   /**
    * 描画
@@ -56,6 +49,6 @@ export default class Block extends Model {
   drawBlock(p5) {
     p5.noStroke()
     p5.fill("#ffb677")
-    p5.rect(this.x, this.y, 80, 400);
+    p5.rect(this.x, this.y, this.width, (window.innerHeight / 2) +100);
   }
 }

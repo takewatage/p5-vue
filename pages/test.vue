@@ -7,76 +7,99 @@
 <script>
 
   import Player from '../models/player'
-  import Block from "../models/block";
+  import Block from "../models/block"
+  import linq from 'linq'
 
-    export default {
-        data () {
-            return {
-                player: undefined,
-                block: undefined
-            }
-        },
+  export default {
+      data () {
+          return {
+              player: undefined,
+              block: undefined,
+              blocks: []
+          }
+      },
 
-        mounted() {
-            const script = (p5) => this.p5(p5)
-            this.makeP5(script)
-        },
+      mounted() {
+          const script = (p5) => this.p5(p5)
+          this.makeP5(script)
+      },
 
-        methods: {
-            p5(p5) {
-                //canvasのおおきさ
-                const width = window.innerWidth
-                const height = window.innerHeight
+      methods: {
+          p5(p5) {
+              const width = window.innerWidth
+              const height = window.innerHeight
 
-                p5.setup = () => {
-                    let canvas = p5.createCanvas(width, height)
-                    canvas.parent("p5Canvas");
+              p5.setup = () => {
+                  let canvas = p5.createCanvas(width, height)
+                  canvas.parent("p5Canvas");
 
-                    p5.rectMode(p5.CENTER);
+                  p5.rectMode(p5.CENTER);
 
-                    // プレイヤーを作成
-                    this.player = new Player()
+                  // プレイヤーを作成
+                  this.player = new Player()
 
-                    // ブロックを作成
-                    this.block = new Block({y:300})
-                }
+                  // 初期ブロックを作成
+                  this.blocks.push( new Block({
+                      width: width,
+                      x: width / 2
+                  }))
+              }
 
 
-                //描画
-                p5.draw = _ => {
-                    // エンティティの位置を更新
-                    this.player.updatePosition()
-                    this.block.updatePosition()
+              //描画
+              p5.draw = _ => {
+                  // ブロックの追加と削除
+                  // 一定間隔で追加
+                  if (p5.frameCount % 80 === 1) {
+                      this.addBlockPair(p5);
+                  }
+                  // 範囲外になったら削除
+                  this.blocks = linq.from(this.blocks).where(x => {
+                      if(x.blockIsAlive) return x
+                  }).toArray()
 
-                    // プレイヤーに重力を適用
-                    this.player.applyGravity()
+                  // エンティティの位置を更新
+                  this.player.updatePosition()
+                  for(let block of this.blocks)  block.updatePosition();
 
-                    // エンティティを描画
-                    p5.background(0)
-                    this.player.drawPlayer(p5)
-                    this.block.drawBlock(p5)
-                }
+                  // プレイヤーに重力を適用
+                  this.player.applyGravity()
 
-                //マウスクリック処理
-                p5.mouseClicked = _=> {
-                    this.player.applyJump();
-                }
+                  // エンティティを描画
+                  p5.background(0)
+                  this.player.drawPlayer(p5)
+                  for (let block of this.blocks) block.drawBlock(p5);
+              }
 
-                return p5
+              //マウスクリック処理
+              p5.mouseClicked = _=> {
+                  this.player.applyJump();
+              }
 
-            },
+              p5.keyTyped = _=> {
+                  console.log(`blocks: ${this.blocks.length}`);
+              }
 
-            makeP5(script) {
-                const P5 = require('p5')
-                new P5(script)
-            },
+              return p5
 
-            /**
-             * プレイヤー作成
-             */
-            createPlayer() {
+          },
 
-            }
-        },
-    }
+          /**
+           * ブロック追加
+           */
+          addBlockPair(p5) {
+              const height = window.innerHeight
+              let y = p5.random(-100, 100);
+              this.blocks.push(new Block({y: y}));　// 下のブロック
+              this.blocks.push(new Block({y: y + height})); // 上のブロック
+              // console.log(this.blocks)
+          },
+
+          makeP5(script) {
+              const P5 = require('p5')
+              new P5(script)
+          },
+
+      },
+  }
 </script>
