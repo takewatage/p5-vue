@@ -25,6 +25,20 @@ export default class Block extends Model {
   }
 
   /**
+   * ブロックのx軸の当たり判定距離取得
+   */
+  get hitDistance_x() {
+    return this.width / 2
+  }
+
+  /**
+   * ブロックのy軸の当たり判定距離取得
+   */
+  get hitDistance_y() {
+    return this.height
+  }
+
+  /**
    * ブロックの位置が画面内なら true を返す
    * @returns {boolean}
    */

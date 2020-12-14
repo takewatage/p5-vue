@@ -10,7 +10,8 @@ export default {
       { hid: 'description', name: 'description', content: 'Nuxt.js project' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet', href: 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css' }
     ]
   },
   /*
@@ -42,10 +43,14 @@ export default {
     { src: '~plugins/bootstrap-vue.js' },
   ],
 
+  services: [
+    { src: '~services/makeContactFormService.js' },
+  ],
+
   modules: ['@nuxtjs/style-resources'],
   styleResources: {
     scss: [
-      './assets/sass/*.scss',
+      './assets/sass/main.scss',
     ]
   },
 }

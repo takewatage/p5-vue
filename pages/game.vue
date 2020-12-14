@@ -1,6 +1,10 @@
 <template>
   <section>
     <div id="p5Canvas"></div>
+
+    <div>
+      {{player}}
+    </div>
   </section>
 </template>
 
@@ -83,7 +87,7 @@
 
               // ブロックの追加と削除
               // 一定間隔で追加
-              if (p5.frameCount % 80 === 1) {
+              if (p5.frameCount % 50 === 1) {
                   this.addBlockPair(p5);
               }
               // 範囲外になったら削除
@@ -100,6 +104,14 @@
 
               // プレイヤーが死んでいたらゲームオーバー
               if (!this.player.playerIsAlive) this.gameState = "gameover";
+
+              // 衝突判定
+              for (let block of this.blocks) {
+                  if (this.entitiesAreColliding(p5, this.player, block, this.player.hitDistance_x + block.hitDistance_x, this.player.hitDistance_y + block.hitDistance_y)) {
+                      this.gameState = "gameover";
+                      break;
+                  }
+              }
           },
 
           /** ゲーム描画 */
@@ -133,6 +145,33 @@
               p5.textSize(64);
               p5.textAlign(p5.CENTER, p5.CENTER); // 横に中央揃え ＆ 縦にも中央揃え
               p5.text("GAME OVER", p5.width / 2, p5.height / 2); // 画面中央にテキスト表示
+          },
+
+          /**
+           * 2つのエンティティが衝突しているかどうかをチェックする
+           *
+           * @param entityA 衝突しているかどうかを確認したいエンティティ
+           * @param entityB 同上
+           * @param collisionXDistance 衝突しないギリギリのx距離
+           * @param collisionYDistance 衝突しないギリギリのy距離
+           * @returns Boolean 衝突していたら `true` そうでなければ `false` を返す
+           */
+          entitiesAreColliding(
+              p5,
+              entityA,
+              entityB,
+              collisionXDistance,
+              collisionYDistance
+          ) {
+              // xとy、いずれかの距離が十分開いていたら、衝突していないので false を返す
+
+              let currentXDistance = p5.abs(entityA.x - entityB.x); // 現在のx距離
+              if (collisionXDistance <= currentXDistance) return false;
+
+              let currentYDistance = p5.abs(entityA.y - entityB.y); // 現在のy距離
+              if (collisionYDistance <= currentYDistance) return false;
+
+              return true;
           },
 
           makeP5(script) {

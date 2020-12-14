@@ -23,6 +23,20 @@ export default class Player extends Model {
     return 'Player'
   }
 
+  /**
+   * プレイヤーのx軸の当たり判定距離取得
+   */
+  get hitDistance_x() {
+    return 25
+  }
+
+  /**
+   * プレイヤーのy軸の当たり判定距離取得
+   */
+  get hitDistance_y() {
+    return 40
+  }
+
 
   /**
    * ポジション更新
@@ -59,6 +73,6 @@ export default class Player extends Model {
   drawPlayer(p5) {
     p5.noStroke()
     p5.fill("#5f6caf");
-    p5.square(this.x, this.y, 50);
+    p5.square(this.x, this.y, 40);
   }
 }
