@@ -17,7 +17,7 @@
     "@ckeditor/ckeditor5-vue": "^1.0.3",
     "@nuxtjs/style-resources": "^0.1.2",
     "@team-decorate/alcjs": "^1.2.0",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "bootstrap-vue": "^2.0.0-rc.21",
     "linq": "^3.2.2",
     "node-sass": "^4.14.1",
